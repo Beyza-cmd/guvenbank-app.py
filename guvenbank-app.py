@@ -192,14 +192,19 @@ if st.session_state.otp_sent:
 
 # --- Başarılı Giriş Sonrası ---
 # --- Başarılı Giriş Sonrası ---
+# --- Başarılı Giriş Sonrası ---
 if st.session_state.authenticated:
-    import streamlit.components.v1 as components
-    components.html(
-        """
-        <meta http-equiv="refresh" content="2; url='https://beyza-cmd.github.io/guvenbank-app.py/'" />
-        <h2 style='text-align:center; color:green;'>✔ Giriş Yaptınız! Yönlendiriliyorsunuz...</h2>
-        """,
-        height=100
-    )
+    st.markdown("""
+        <h2 style='text-align:center; color:green;'>✔ Giriş Yaptınız!</h2>
+        <p style='text-align:center;'>
+            <a href='https://beyza-cmd.github.io/guvenbank-app.py/' target='_blank' style='
+                font-size:18px;
+                color:#003366;
+                text-decoration:none;
+                font-weight:bold;
+            '>👉 GüvenBank Uygulamasına Git</a>
+        </p>
+    """, unsafe_allow_html=True)
+
 
 
