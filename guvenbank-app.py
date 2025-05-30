@@ -184,32 +184,31 @@ if st.session_state.otp_sent:
         cursor.execute("SELECT id, name, expiration FROM otps WHERE otp = ?", (otp_input,))
         result = cursor.fetchone()
 
-        if result:
-            otp_id, user_name, expiration_db = result
-            if isinstance(expiration_db, str):
-                expiration_db = datetime.strptime(expiration_db, '%Y-%m-%d %H:%M:%S.%f')
-            if datetime.now() < expiration_db:
-                cursor.execute("DELETE FROM otps WHERE id = ?", (otp_id,))
-                conn.commit()
+if result:
+    otp_id, user_name, expiration_db = result
+    if isinstance(expiration_db, str):
+        expiration_db = datetime.strptime(expiration_db, '%Y-%m-%d %H:%M:%S.%f')
+    if datetime.now() < expiration_db:
+        cursor.execute("DELETE FROM otps WHERE id = ?", (otp_id,))
+        conn.commit()
 
-                # Şifreyi SHA-256 ile hashle
-                hashed_password = hashlib.sha256(new_password.encode()).hexdigest()
-    
-                # Hash'lenmiş şifreyi veritabanına kaydet
-                cursor.execute("INSERT INTO sifre_guncelleme (name, new_password, usage_period, updated_at) VALUES (?, ?, ?, ?)",
-                           (st.session_state.get('user_name', 'Kullanıcı'), hashed_password, usage_frequency, datetime.now()))
-                conn.commit()
+        # Şifreyi SHA-256 ile hashle
+        hashed_password = hashlib.sha256(new_password.encode()).hexdigest()
 
+        # Hash'lenmiş şifreyi veritabanına kaydet
+        cursor.execute("INSERT INTO sifre_guncelleme (name, new_password, usage_period, updated_at) VALUES (?, ?, ?, ?)",
+                   (st.session_state.get('user_name', 'Kullanıcı'), hashed_password, usage_frequency, datetime.now()))
+        conn.commit()
 
-                st.success("Giriş Başarılı!")
-                st.session_state.authenticated = True
-                st.session_state.otp_sent = False
-                st.session_state.user_name = user_name
+        st.success("Giriş Başarılı!")
+        st.session_state.authenticated = True
+        st.session_state.otp_sent = False
+        st.session_state.user_name = user_name
+    else:
+        st.error("Şifrenizin süresi dolmuş!")
+else:
+    st.error("Geçersiz şifre!")
 
-            else:
-                st.error("Şifrenizin süresi dolmuş!")
-            else:
-                st.error("Geçersiz şifre!")
             
 
 # --- Başarılı Giriş Sonrası ---
