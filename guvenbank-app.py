@@ -5,6 +5,7 @@ import smtplib
 from email.mime.text import MIMEText
 from datetime import datetime, timedelta
 import sqlite3
+import streamlit.components.v1 as components
 
 # --- Veritabanı Bağlantısı ---
 conn = sqlite3.connect("guvenbank.db", detect_types=sqlite3.PARSE_DECLTYPES|sqlite3.PARSE_COLNAMES)
@@ -115,32 +116,24 @@ if "show_otp_option" not in st.session_state:
     st.session_state.show_otp_option = False
 if "otp_sent" not in st.session_state:
     st.session_state.otp_sent = False
-if "user_fullname" not in st.session_state:
-    st.session_state.user_fullname = ""
 
 # --- Kullanıcı Giriş Alanı ---
-if not st.session_state.authenticated:
-    st.subheader("Giriş Yap")
-    name = st.text_input("Ad Soyad")
-    password = st.text_input("Şifre", type="password")
+st.subheader("Giriş Yap")
+name = st.text_input("Ad Soyad")
+password = st.text_input("Şifre", type="password")
 
-    if st.button("Giriş Yap"):
-        if name and password:
-            if name.lower() == "admin" and password == "admin_2025!":
-                st.session_state.authenticated = True
-                st.session_state.user_fullname = name
-                st.success("Admin olarak giriş yapıldı. Giriş kayıtları gösteriliyor:")
-                cursor.execute("SELECT * FROM giris_kayitlari")
-                records = cursor.fetchall()
-                for record in records:
-                    st.write(f"Ad: {record[1]}, Giriş Zamanı: {record[2]}")
-            else:
-                st.error("Geçersiz kullanıcı adı veya şifre!")
+if st.button("Giriş Yap"):
+    if name and password:
+        if name.lower() == "admin" and password == "admin_2025!":
+            st.success("Admin olarak giriş yapıldı. Giriş kayıtları gösteriliyor:")
+            cursor.execute("SELECT * FROM giris_kayitlari")
+            records = cursor.fetchall()
+            for record in records:
+                st.write(f"Ad: {record[1]}, Giriş Zamanı: {record[2]}")
         else:
-            st.error("Lütfen tüm alanları doldurun.")
-
-else:
-    st.success(f"Hoşgeldiniz, {st.session_state.user_fullname}!")
+            st.error("Geçersiz kullanıcı adı veya şifre!")
+    else:
+        st.error("Lütfen tüm alanları doldurun.")
 
 # --- Tek Kullanımlık Şifre Seçeneği ---
 st.subheader("Tek Kullanımlık Şifre")
@@ -192,14 +185,24 @@ if st.session_state.otp_sent:
 
                 st.success("Giriş Başarılı!")
                 st.session_state.authenticated = True
-                st.session_state.user_fullname = user_name  # Burada da kullanıcı adını atıyoruz
                 st.session_state.otp_sent = False
             else:
                 st.error("Şifrenizin süresi dolmuş!")
         else:
             st.error("Geçersiz şifre!")
 
-# Başlık kapanışı
-st.markdown('</div>', unsafe_allow_html=True)
+# --- Başarılı Giriş Sonrası ---
+if st.session_state.authenticated:
+    st.markdown("""
+        <h2 style='text-align:center; color:green;'>✔ Giriş Yaptınız!</h2>
+        <p style='text-align:center;'>
+            <a href='https://beyza-cmd.github.io/guvenbank-app.py/' target='_blank' style='
+                font-size:18px;
+                color:#003366;
+                text-decoration:none;
+                font-weight:bold;
+            '>👉 GüvenBank Uygulamasına Git</a>
+        </p>
+    """, unsafe_allow_html=True)
 
 
