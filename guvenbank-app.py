@@ -116,8 +116,6 @@ if "show_otp_option" not in st.session_state:
     st.session_state.show_otp_option = False
 if "otp_sent" not in st.session_state:
     st.session_state.otp_sent = False
-if "user_name" not in st.session_state:
-    st.session_state.user_name = ""
 
 # --- Kullanıcı Giriş Alanı ---
 st.subheader("Giriş Yap")
@@ -185,12 +183,9 @@ if st.session_state.otp_sent:
                 cursor.execute("INSERT INTO giris_kayitlari (name, login_time) VALUES (?, ?)", (user_name, datetime.now()))
                 conn.commit()
 
-                # Kullanıcı adını session_state'e kaydet
-                st.session_state.authenticated = True
-                st.session_state.user_name = user_name
-                st.session_state.otp_sent = False
-
                 st.success("Giriş Başarılı!")
+                st.session_state.authenticated = True
+                st.session_state.otp_sent = False
             else:
                 st.error("Şifrenizin süresi dolmuş!")
         else:
@@ -198,18 +193,8 @@ if st.session_state.otp_sent:
 
 # --- Başarılı Giriş Sonrası ---
 if st.session_state.authenticated:
-    user_name = st.session_state.get("user_name", "Kullanıcı")
-
-    # localStorage'a kullanıcı adını yazan JS kodu
-    js_code = f"""
-    <script>
-        localStorage.setItem('fullname', '{user_name}');
-    </script>
-    """
-    components.html(js_code)
-
-    st.markdown(f"""
-        <h2 style='text-align:center; color:green;'>✔ Giriş Yaptınız, {user_name}!</h2>
+    st.markdown("""
+        <h2 style='text-align:center; color:green;'>✔ Giriş Yaptınız!</h2>
         <p style='text-align:center;'>
             <a href='https://beyza-cmd.github.io/guvenbank-app.py/' target='_blank' style='
                 font-size:18px;
@@ -219,8 +204,6 @@ if st.session_state.authenticated:
             '>👉 GüvenBank Uygulamasına Git</a>
         </p>
     """, unsafe_allow_html=True)
-
-st.markdown('</div>', unsafe_allow_html=True)
 
 
 
