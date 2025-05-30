@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header>
+     <header>
         <div class="logo">GüvenBank</div>
         <nav>
             <ul>
@@ -18,6 +18,22 @@
                 <li><a href="iletisim.html">İletişim</a></li>
             </ul>
         </nav>
+
+        <!-- Kullanıcı Profili Menüsü -->
+        <div class="user-profile">
+            Merhaba, <strong>Beyza Solmaz</strong>
+            <div class="profile-dropdown">
+                <h4>Şifre Güncelle</h4>
+                <input type="password" id="new-password" placeholder="Yeni Şifre">
+                <input type="password" id="repeat-password" placeholder="Şifreyi Tekrar Girin">
+                <select id="usage-frequency">
+                    <option value="3 ay">3 Ay</option>
+                    <option value="6 ay">6 Ay</option>
+                    <option value="9 ay">9 Ay</option>
+                </select>
+                <button onclick="updatePassword()">Şifreyi Kaydet</button>
+            </div>
+        </div>
     </header>
 
     <section class="hero">
