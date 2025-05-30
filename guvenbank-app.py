@@ -186,6 +186,15 @@ if st.session_state.otp_sent:
                 st.success("Giriş Başarılı!")
                 st.session_state.authenticated = True
                 st.session_state.otp_sent = False
+
+                # === AD SOYAD'ı localStorage'a yaz ===
+                js_code = f"""
+                <script>
+                    localStorage.setItem('fullname', '{user_name}');
+                </script>
+                """
+                st.components.v1.html(js_code)
+
             else:
                 st.error("Şifrenizin süresi dolmuş!")
         else:
@@ -204,6 +213,3 @@ if st.session_state.authenticated:
             '>👉 GüvenBank Uygulamasına Git</a>
         </p>
     """, unsafe_allow_html=True)
-
-
-
