@@ -117,7 +117,7 @@ if "show_otp_option" not in st.session_state:
 if "otp_sent" not in st.session_state:
     st.session_state.otp_sent = False
 if "user_name" not in st.session_state:
-    st.session_state.user_name = None
+    st.session_state.user_name = ""
 
 # --- Kullanıcı Giriş Alanı ---
 st.subheader("Giriş Yap")
@@ -155,7 +155,6 @@ if st.session_state.show_otp_option and not st.session_state.otp_sent:
             st.session_state.otp = otp
             st.session_state.otp_expiration = expiration
             st.session_state.otp_sent = True
-            st.session_state.user_name = name2  # Burada kullanıcı adını kaydediyoruz.
 
             cursor.execute("INSERT INTO otps (name, email, otp, expiration) VALUES (?, ?, ?, ?)",
                            (name2, email, otp, expiration))
@@ -186,10 +185,12 @@ if st.session_state.otp_sent:
                 cursor.execute("INSERT INTO giris_kayitlari (name, login_time) VALUES (?, ?)", (user_name, datetime.now()))
                 conn.commit()
 
-                st.success("Giriş Başarılı!")
+                # Kullanıcı adını session_state'e kaydet
                 st.session_state.authenticated = True
+                st.session_state.user_name = user_name
                 st.session_state.otp_sent = False
-                st.session_state.user_name = user_name  # Giriş yapan kullanıcı adını güncelle (daha doğru olur).
+
+                st.success("Giriş Başarılı!")
             else:
                 st.error("Şifrenizin süresi dolmuş!")
         else:
@@ -198,6 +199,15 @@ if st.session_state.otp_sent:
 # --- Başarılı Giriş Sonrası ---
 if st.session_state.authenticated:
     user_name = st.session_state.get("user_name", "Kullanıcı")
+
+    # localStorage'a kullanıcı adını yazan JS kodu
+    js_code = f"""
+    <script>
+        localStorage.setItem('fullname', '{user_name}');
+    </script>
+    """
+    components.html(js_code)
+
     st.markdown(f"""
         <h2 style='text-align:center; color:green;'>✔ Giriş Yaptınız, {user_name}!</h2>
         <p style='text-align:center;'>
@@ -209,5 +219,8 @@ if st.session_state.authenticated:
             '>👉 GüvenBank Uygulamasına Git</a>
         </p>
     """, unsafe_allow_html=True)
+
+st.markdown('</div>', unsafe_allow_html=True)
+
 
 
