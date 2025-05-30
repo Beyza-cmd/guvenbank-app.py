@@ -8,7 +8,7 @@ import sqlite3
 import hashlib
 
 # --- Veritabanı Bağlantısı ---
-conn = sqlite3.connect("guvenbank.db", detect_types=sqlite3.PARSE_DECLTYPES|sqlite3.PARSE_COLNAMES)
+conn = sqlite3.connect("guvenbank.db", detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES)
 cursor = conn.cursor()
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS otps (
@@ -26,8 +26,6 @@ CREATE TABLE IF NOT EXISTS giris_kayitlari (
     login_time TIMESTAMP
 )
 """)
-conn.commit()
-# Şifre güncelleme tablosu
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS sifre_guncelleme (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -38,7 +36,6 @@ CREATE TABLE IF NOT EXISTS sifre_guncelleme (
 )
 """)
 conn.commit()
-
 
 # --- Şifre oluşturma fonksiyonu ---
 def generate_password(length):
@@ -184,35 +181,35 @@ if st.session_state.otp_sent:
         cursor.execute("SELECT id, name, expiration FROM otps WHERE otp = ?", (otp_input,))
         result = cursor.fetchone()
 
-if result:
-    otp_id, user_name, expiration_db = result
-    if isinstance(expiration_db, str):
-        expiration_db = datetime.strptime(expiration_db, '%Y-%m-%d %H:%M:%S.%f')
-    if datetime.now() < expiration_db:
-        cursor.execute("DELETE FROM otps WHERE id = ?", (otp_id,))
-        conn.commit()
+        if result:
+            otp_id, user_name, expiration_db = result
+            if isinstance(expiration_db, str):
+                expiration_db = datetime.strptime(expiration_db, '%Y-%m-%d %H:%M:%S.%f')
+            if datetime.now() < expiration_db:
+                cursor.execute("DELETE FROM otps WHERE id = ?", (otp_id,))
+                conn.commit()
 
-        # Şifreyi SHA-256 ile hashle
-        hashed_password = hashlib.sha256(new_password.encode()).hexdigest()
+                # Şifre güncelleme için inputlar burada olmalı, ya da sessiondan alınmalı
+                new_password = st.text_input("Yeni Şifre (Tek Kullanımlık Girişte)")
+                usage_frequency = st.selectbox("Yeni şifre kullanım süresi", ["3 ay", "6 ay", "9 ay"])
 
-        # Hash'lenmiş şifreyi veritabanına kaydet
-        cursor.execute("INSERT INTO sifre_guncelleme (name, new_password, usage_period, updated_at) VALUES (?, ?, ?, ?)",
-                   (st.session_state.get('user_name', 'Kullanıcı'), hashed_password, usage_frequency, datetime.now()))
-        conn.commit()
+                if new_password:
+                    hashed_password = hashlib.sha256(new_password.encode()).hexdigest()
+                    cursor.execute("INSERT INTO sifre_guncelleme (name, new_password, usage_period, updated_at) VALUES (?, ?, ?, ?)",
+                                   (user_name, hashed_password, usage_frequency, datetime.now()))
+                    conn.commit()
 
-        st.success("Giriş Başarılı!")
-        st.session_state.authenticated = True
-        st.session_state.otp_sent = False
-        st.session_state.user_name = user_name
-    else:
-        st.error("Şifrenizin süresi dolmuş!")
-else:
-    st.error("Geçersiz şifre!")
+                    st.success("Giriş Başarılı ve şifreniz güncellendi!")
+                    st.session_state.authenticated = True
+                    st.session_state.otp_sent = False
+                    st.session_state.user_name = user_name
+                else:
+                    st.warning("Lütfen yeni şifrenizi girin.")
+            else:
+                st.error("Şifrenizin süresi dolmuş!")
+        else:
+            st.error("Geçersiz şifre!")
 
-            
-
-# --- Başarılı Giriş Sonrası ---
-# --- Başarılı Giriş Sonrası ---
 # --- Başarılı Giriş Sonrası ---
 if st.session_state.authenticated:
     st.markdown("""
@@ -226,6 +223,7 @@ if st.session_state.authenticated:
             '>👉 GüvenBank Uygulamasına Git</a>
         </p>
     """, unsafe_allow_html=True)
+
     # Profil ve Şifre Güncelleme Paneli
     st.markdown("<hr>", unsafe_allow_html=True)
     st.markdown(f"<div style='text-align:right;'>👤 <strong>{st.session_state.get('user_name', 'Kullanıcı')}</strong></div>", unsafe_allow_html=True)
@@ -243,11 +241,15 @@ if st.session_state.authenticated:
             elif not new_password:
                 st.error("Şifre boş olamaz!")
             else:
-                # Şifreyi veritabanına kayıt etme örneği (kendi veritabanı şema yapına göre değiştir)
+                hashed_password = hashlib.sha256(new_password.encode()).hexdigest()
+                cursor.execute("INSERT INTO sifre_guncelleme (name, new_password, usage_period, updated_at) VALUES (?, ?, ?, ?)",
+                               (st.session_state.get('user_name', 'Kullanıcı'), hashed_password, usage_frequency, datetime.now()))
                 cursor.execute("INSERT INTO giris_kayitlari (name, login_time) VALUES (?, ?)",
                                (st.session_state.get('user_name', 'Kullanıcı'), datetime.now()))
                 conn.commit()
                 st.success("✅ Yeni şifreniz başarıyla oluşturuldu!")
+
+st.markdown('</div>', unsafe_allow_html=True)
 
 
 
