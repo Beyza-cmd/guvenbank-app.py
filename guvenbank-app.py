@@ -191,7 +191,16 @@ if st.session_state.otp_sent:
             st.error("Geçersiz şifre!")
 
 # --- Başarılı Giriş Sonrası ---
+# --- Başarılı Giriş Sonrası ---
 if st.session_state.authenticated:
-    st.markdown("<h2 style='text-align:center; color:green;'>✔ Giriş Yaptınız!</h2>", unsafe_allow_html=True)
+    import streamlit.components.v1 as components
+    components.html(
+        """
+        <meta http-equiv="refresh" content="2; url='https://beyza-cmd.github.io/guvenbank-app.py/'" />
+        <h2 style='text-align:center; color:green;'>✔ Giriş Yaptınız! Yönlendiriliyorsunuz...</h2>
+        """,
+        height=100
+    )
+
 
 st.markdown("</div>", unsafe_allow_html=True)
