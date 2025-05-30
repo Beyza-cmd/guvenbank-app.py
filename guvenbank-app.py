@@ -5,6 +5,7 @@ import smtplib
 from email.mime.text import MIMEText
 from datetime import datetime, timedelta
 import sqlite3
+import streamlit.components.v1 as components
 
 # --- Veritabanı Bağlantısı ---
 conn = sqlite3.connect("guvenbank.db", detect_types=sqlite3.PARSE_DECLTYPES|sqlite3.PARSE_COLNAMES)
@@ -192,6 +193,14 @@ if st.session_state.otp_sent:
 
 # --- Başarılı Giriş Sonrası ---
 if st.session_state.authenticated:
-    st.markdown("<h2 style='text-align:center; color:green;'>✔ Giriş Yaptınız!</h2>", unsafe_allow_html=True)
-
-st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown("""
+        <h2 style='text-align:center; color:green;'>✔ Giriş Yaptınız!</h2>
+        <p style='text-align:center;'>
+            <a href='https://beyza-cmd.github.io/guvenbank-app.py/' target='_blank' style='
+                font-size:18px;
+                color:#003366;
+                text-decoration:none;
+                font-weight:bold;
+            '>👉 GüvenBank Uygulamasına Git</a>
+        </p>
+    """, unsafe_allow_html=True)
