@@ -1,151 +1,96 @@
+<?php
+session_start();
+
+// Veritabanı bağlantısı
+try {
+    $db = new PDO("mysql:host=localhost;dbname=guvenbank;charset=utf8", "kullanici_adi", "sifre");
+    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("Veritabanı bağlantı hatası: " . $e->getMessage());
+}
+
+// Giriş işlemi
+$hata = "";
+if (isset($_POST['email']) && isset($_POST['sifre'])) {
+    $email = $_POST['email'];
+    $sifre = $_POST['sifre'];
+
+    $sorgu = $db->prepare("SELECT * FROM kullanicilar WHERE email = ?");
+    $sorgu->execute([$email]);
+    $kullanici = $sorgu->fetch(PDO::FETCH_ASSOC);
+
+    if ($kullanici && password_verify($sifre, $kullanici['sifre'])) {
+        $_SESSION['email'] = $email;
+        header("Location: ".$_SERVER['PHP_SELF']);
+        exit;
+    } else {
+        $hata = "Geçersiz kullanıcı adı veya şifre!";
+    }
+}
+
+// Oturumdan kullanıcı adı alma
+$kullanici_adi = "";
+if (isset($_SESSION['email'])) {
+    $sorgu = $db->prepare("SELECT ad, soyad FROM kullanicilar WHERE email = ?");
+    $sorgu->execute([$_SESSION['email']]);
+    $kullanici = $sorgu->fetch(PDO::FETCH_ASSOC);
+    if ($kullanici) {
+        $kullanici_adi = $kullanici['ad'] . " " . $kullanici['soyad'];
+    }
+}
+
+// Çıkış işlemi
+if (isset($_GET['cikis'])) {
+    session_destroy();
+    header("Location: ".$_SERVER['PHP_SELF']);
+    exit;
+}
+?>
+
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GüvenBank - Anasayfa</title>
-    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8" />
+    <title>GüvenBank</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f6f8fa;
-        }
-
-        header {
-            background-color: #003366;
-            padding: 15px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            color: white;
-        }
-
-        .logo {
-            font-size: 24px;
-            font-weight: bold;
-        }
-
-        nav ul {
-            list-style: none;
-            display: flex;
-            gap: 20px;
-        }
-
-        nav a {
-            color: white;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        .user-profile {
-            position: relative;
-            background-color: #f1f1f1;
-            padding: 10px 15px;
-            border-radius: 8px;
-            color: black;
-            cursor: pointer;
-        }
-
-        .user-profile:hover .profile-dropdown {
-            display: block;
-        }
-
-        .profile-dropdown {
-            display: none;
-            position: absolute;
-            top: 45px;
-            right: 0;
-            background-color: #fff;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-            padding: 15px;
-            width: 250px;
-            z-index: 999;
-        }
-
-        .profile-dropdown input,
-        .profile-dropdown select {
-            width: 100%;
-            margin-bottom: 10px;
-            padding: 8px;
-        }
-
-        .profile-dropdown button {
-            padding: 8px;
-            width: 100%;
-            background-color: #003366;
-            color: white;
-            border: none;
-            border-radius: 5px;
-        }
-
-        .hero {
-            text-align: center;
-            padding: 100px 20px 60px;
-            background-color: #004080;
-            color: white;
-        }
-
-        .hero h1 {
-            font-size: 36px;
-        }
-
-        .hero p {
-            font-size: 18px;
-            margin-top: 10px;
-        }
-
-        .btn {
-            margin-top: 20px;
-            padding: 10px 20px;
-            background-color: white;
-            color: #004080;
-            text-decoration: none;
-            font-weight: bold;
-            border-radius: 5px;
-        }
-
-        .features {
-            display: flex;
-            justify-content: space-around;
-            padding: 40px;
-            background-color: #fff;
-        }
-
-        .feature {
-            width: 30%;
-            background-color: #f1f1f1;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-        }
-
-        footer {
-            background-color: #003366;
-            color: white;
-            text-align: center;
-            padding: 15px;
-        }
+        /* Kısaltılmış stiller */
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+        header { background: #003366; color: white; padding: 15px 20px; position: relative; }
+        .logo { font-size: 24px; font-weight: bold; }
+        nav ul { list-style: none; padding: 0; margin: 0; display: flex; gap: 20px; }
+        nav ul li a { color: white; text-decoration: none; }
+        .user-profile { position: absolute; top: 15px; right: 20px; background-color: #f1f1f1; padding: 10px 15px; border-radius: 8px; cursor: pointer; color: black; }
+        .user-profile:hover .profile-dropdown { display: block; }
+        .profile-dropdown { display: none; position: absolute; top: 45px; right: 0; background: white; padding: 15px; border-radius: 8px; width: 250px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); z-index: 999; color: black; }
+        .profile-dropdown input, .profile-dropdown select { width: 100%; margin-bottom: 10px; padding: 8px; }
+        .profile-dropdown button { width: 100%; padding: 8px; background: #003366; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        .hero { padding: 40px 20px; background: #f0f0f0; text-align: center; }
+        .features { display: flex; justify-content: center; gap: 40px; padding: 20px; }
+        .feature { background: white; padding: 20px; border-radius: 8px; width: 250px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        footer { text-align: center; padding: 20px; background: #003366; color: white; margin-top: 40px; }
+        form { max-width: 300px; margin: 40px auto; padding: 20px; background: #f9f9f9; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+        form input { width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 5px; border: 1px solid #ccc; }
+        form button { width: 100%; padding: 10px; background: #003366; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        .error { color: red; margin-bottom: 10px; text-align: center; }
     </style>
 </head>
 <body>
-    <header>
-        <div class="logo">GüvenBank</div>
-        <nav>
-            <ul>
-                <li><a href="index.html">Anasayfa</a></li>
-                <li><a href="hakkimizda.html">Hakkımızda</a></li>
-                <li><a href="hizmetler.html">Hizmetler</a></li>
-                <li><a href="kampanyalar.html">Kampanyalar</a></li>
-                <li><a href="iletisim.html">İletişim</a></li>
-            </ul>
-        </nav>
 
-        <!-- Kullanıcı Profili Menüsü -->
+<header>
+    <div class="logo">GüvenBank</div>
+    <nav>
+        <ul>
+            <li><a href="<?= $_SERVER['PHP_SELF'] ?>">Anasayfa</a></li>
+            <li><a href="#">Hakkımızda</a></li>
+            <li><a href="#">Hizmetler</a></li>
+            <li><a href="#">Kampanyalar</a></li>
+            <li><a href="#">İletişim</a></li>
+        </ul>
+    </nav>
+
+    <?php if ($kullanici_adi): ?>
         <div class="user-profile" id="user-profile">
-            Merhaba, <strong id="user-fullname">Kullanıcı</strong>
+            Merhaba, <strong id="user-fullname"><?= htmlspecialchars($kullanici_adi) ?></strong>
             <div class="profile-dropdown">
                 <h4>Şifre Güncelle</h4>
                 <input type="password" id="new-password" placeholder="Yeni Şifre">
@@ -156,14 +101,28 @@
                     <option value="9 ay">9 Ay</option>
                 </select>
                 <button onclick="updatePassword()">Şifreyi Kaydet</button>
+                <hr>
+                <a href="?cikis=1" style="color:#003366; display:block; text-align:center; text-decoration:none; margin-top:10px;">Çıkış Yap</a>
             </div>
         </div>
-    </header>
+    <?php endif; ?>
+</header>
 
+<?php if (!$kullanici_adi): ?>
+    <form method="post" action="<?= $_SERVER['PHP_SELF'] ?>">
+        <h2>Giriş Yap</h2>
+        <?php if ($hata): ?>
+            <div class="error"><?= htmlspecialchars($hata) ?></div>
+        <?php endif; ?>
+        <input type="email" name="email" placeholder="E-posta" required>
+        <input type="password" name="sifre" placeholder="Şifre" required>
+        <button type="submit">Giriş Yap</button>
+    </form>
+<?php else: ?>
     <section class="hero">
         <h1>GüvenBank'a Hoş Geldiniz</h1>
         <p>Finansal geleceğinizi güvenle inşa edin. Modern çözümler, geleneksel güven ile.</p>
-        <a href="hizmetler.html" class="btn">Hizmetlerimizi Keşfedin</a>
+        <a href="#" class="btn">Hizmetlerimizi Keşfedin</a>
     </section>
 
     <section class="features">
@@ -184,35 +143,26 @@
     <footer>
         <p>&copy; 2025 GüvenBank. Tüm hakları saklıdır.</p>
     </footer>
+<?php endif; ?>
 
-    <script>
-        // Giriş yapan kullanıcının adı (örneğin streamlit üzerinden localStorage ile aktarılabilir)
-        const userFullname = localStorage.getItem('fullname') || "Kullanıcı";
-        document.getElementById("user-fullname").innerText = userFullname;
+<script>
+function updatePassword() {
+    const newPassword = document.getElementById('new-password').value;
+    const repeatPassword = document.getElementById('repeat-password').value;
+    const usage = document.getElementById('usage-frequency').value;
 
-        function updatePassword() {
-            const newPassword = document.getElementById('new-password').value;
-            const repeatPassword = document.getElementById('repeat-password').value;
-            const usage = document.getElementById('usage-frequency').value;
+    if (!newPassword || !repeatPassword) {
+        alert("Lütfen tüm alanları doldurun.");
+        return;
+    }
+    if (newPassword !== repeatPassword) {
+        alert("Şifreler eşleşmiyor.");
+        return;
+    }
+    alert("Yeni şifreniz başarıyla kaydedildi.\nKullanım süresi: " + usage);
+    // Backend için AJAX ekleyebilirsin
+}
+</script>
 
-            if (!newPassword || !repeatPassword) {
-                alert("Lütfen tüm alanları doldurun.");
-                return;
-            }
-
-            if (newPassword !== repeatPassword) {
-                alert("Şifreler eşleşmiyor.");
-                return;
-            }
-
-            alert("Yeni şifreniz başarıyla kaydedildi.\nKullanım süresi: " + usage);
-
-            // Form temizleniyor
-            document.getElementById('new-password').value = "";
-            document.getElementById('repeat-password').value = "";
-            document.getElementById('usage-frequency').selectedIndex = 0;
-        }
-    </script>
 </body>
 </html>
-
