@@ -5,7 +5,6 @@ import smtplib
 from email.mime.text import MIMEText
 from datetime import datetime, timedelta
 import sqlite3
-import streamlit.components.v1 as components
 
 # --- Veritabanı Bağlantısı ---
 conn = sqlite3.connect("guvenbank.db", detect_types=sqlite3.PARSE_DECLTYPES|sqlite3.PARSE_COLNAMES)
@@ -116,6 +115,8 @@ if "show_otp_option" not in st.session_state:
     st.session_state.show_otp_option = False
 if "otp_sent" not in st.session_state:
     st.session_state.otp_sent = False
+if "user_fullname" not in st.session_state:
+    st.session_state.user_fullname = ""
 
 # --- Kullanıcı Giriş Alanı ---
 st.subheader("Giriş Yap")
@@ -130,8 +131,19 @@ if st.button("Giriş Yap"):
             records = cursor.fetchall()
             for record in records:
                 st.write(f"Ad: {record[1]}, Giriş Zamanı: {record[2]}")
+            st.session_state.authenticated = True
+            st.session_state.user_fullname = name
         else:
-            st.error("Geçersiz kullanıcı adı veya şifre!")
+            # Burada kullanıcı doğrulama yapılmalı (veritabanı veya başka yöntem)
+            # Şimdilik örnek olarak sabit şifreyle giriş izni veriyoruz:
+            if password == "kullanici_sifre":
+                st.success(f"{name} olarak giriş yapıldı.")
+                st.session_state.authenticated = True
+                st.session_state.user_fullname = name
+                cursor.execute("INSERT INTO giris_kayitlari (name, login_time) VALUES (?, ?)", (name, datetime.now()))
+                conn.commit()
+            else:
+                st.error("Geçersiz kullanıcı adı veya şifre!")
     else:
         st.error("Lütfen tüm alanları doldurun.")
 
@@ -185,6 +197,7 @@ if st.session_state.otp_sent:
 
                 st.success("Giriş Başarılı!")
                 st.session_state.authenticated = True
+                st.session_state.user_fullname = user_name  # Kullanıcı adını sessiona kaydet
                 st.session_state.otp_sent = False
             else:
                 st.error("Şifrenizin süresi dolmuş!")
@@ -193,8 +206,8 @@ if st.session_state.otp_sent:
 
 # --- Başarılı Giriş Sonrası ---
 if st.session_state.authenticated:
-    st.markdown("""
-        <h2 style='text-align:center; color:green;'>✔ Giriş Yaptınız!</h2>
+    st.markdown(f"""
+        <h2 style='text-align:center; color:green;'>✔ Hoşgeldiniz, {st.session_state.user_fullname}!</h2>
         <p style='text-align:center;'>
             <a href='https://beyza-cmd.github.io/guvenbank-app.py/' target='_blank' style='
                 font-size:18px;
@@ -204,3 +217,6 @@ if st.session_state.authenticated:
             '>👉 GüvenBank Uygulamasına Git</a>
         </p>
     """, unsafe_allow_html=True)
+
+st.markdown('</div>', unsafe_allow_html=True)
+
