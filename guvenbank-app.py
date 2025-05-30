@@ -193,12 +193,12 @@ if st.session_state.otp_sent:
                 conn.commit()
 
                 # Şifreyi SHA-256 ile hashle
-hashed_password = hashlib.sha256(new_password.encode()).hexdigest()
-
-# Hash'lenmiş şifreyi veritabanına kaydet
-cursor.execute("INSERT INTO sifre_guncelleme (name, new_password, usage_period, updated_at) VALUES (?, ?, ?, ?)",
-               (st.session_state.get('user_name', 'Kullanıcı'), hashed_password, usage_frequency, datetime.now()))
-conn.commit()
+                hashed_password = hashlib.sha256(new_password.encode()).hexdigest()
+    
+                # Hash'lenmiş şifreyi veritabanına kaydet
+                cursor.execute("INSERT INTO sifre_guncelleme (name, new_password, usage_period, updated_at) VALUES (?, ?, ?, ?)",
+                           (st.session_state.get('user_name', 'Kullanıcı'), hashed_password, usage_frequency, datetime.now()))
+                conn.commit()
 
 
                 st.success("Giriş Başarılı!")
