@@ -203,4 +203,3 @@ if st.session_state.authenticated:
     )
 
 
-st.markdown("</div>", unsafe_allow_html=True)
