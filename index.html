@@ -6,13 +6,45 @@
     <title>GüvenBank - Anasayfa</title>
     <link rel="stylesheet" href="style.css">
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f6f8fa;
+        }
+
+        header {
+            background-color: #003366;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
         .user-profile {
-            position: absolute;
-            top: 10px;
-            right: 20px;
+            position: relative;
             background-color: #f1f1f1;
             padding: 10px 15px;
             border-radius: 8px;
+            color: black;
             cursor: pointer;
         }
 
@@ -47,6 +79,54 @@
             color: white;
             border: none;
             border-radius: 5px;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 100px 20px 60px;
+            background-color: #004080;
+            color: white;
+        }
+
+        .hero h1 {
+            font-size: 36px;
+        }
+
+        .hero p {
+            font-size: 18px;
+            margin-top: 10px;
+        }
+
+        .btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: white;
+            color: #004080;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 5px;
+        }
+
+        .features {
+            display: flex;
+            justify-content: space-around;
+            padding: 40px;
+            background-color: #fff;
+        }
+
+        .feature {
+            width: 30%;
+            background-color: #f1f1f1;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        footer {
+            background-color: #003366;
+            color: white;
+            text-align: center;
+            padding: 15px;
         }
     </style>
 </head>
@@ -106,7 +186,7 @@
     </footer>
 
     <script>
-        // Kullanıcının adını localStorage'dan al ve göster
+        // Giriş yapan kullanıcının adı (örneğin streamlit üzerinden localStorage ile aktarılabilir)
         const userFullname = localStorage.getItem('fullname') || "Kullanıcı";
         document.getElementById("user-fullname").innerText = userFullname;
 
@@ -127,7 +207,7 @@
 
             alert("Yeni şifreniz başarıyla kaydedildi.\nKullanım süresi: " + usage);
 
-            // Formu temizle
+            // Form temizleniyor
             document.getElementById('new-password').value = "";
             document.getElementById('repeat-password').value = "";
             document.getElementById('usage-frequency').selectedIndex = 0;
