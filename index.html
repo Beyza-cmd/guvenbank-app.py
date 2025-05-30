@@ -64,8 +64,8 @@
         </nav>
 
         <!-- Kullanıcı Profili Menüsü -->
-        <div class="user-profile">
-            Merhaba, <strong>Beyza Solmaz</strong>
+        <div class="user-profile" id="user-profile">
+            Merhaba, <strong id="user-fullname">Kullanıcı</strong>
             <div class="profile-dropdown">
                 <h4>Şifre Güncelle</h4>
                 <input type="password" id="new-password" placeholder="Yeni Şifre">
@@ -105,8 +105,11 @@
         <p>&copy; 2025 GüvenBank. Tüm hakları saklıdır.</p>
     </footer>
 
-    <!-- JavaScript -->
     <script>
+        // Kullanıcının ad soyad bilgisini localStorage'dan al
+        const userFullname = localStorage.getItem('fullname') || "Kullanıcı";
+        document.getElementById("user-fullname").innerText = userFullname;
+
         function updatePassword() {
             const newPassword = document.getElementById('new-password').value;
             const repeatPassword = document.getElementById('repeat-password').value;
@@ -122,7 +125,6 @@
                 return;
             }
 
-            // Sunucuya gönderme işlemi burada olabilir (şimdilik sadece mesaj)
             alert("Yeni şifreniz başarıyla kaydedildi.\nKullanım süresi: " + usage);
 
             // Formu temizle
