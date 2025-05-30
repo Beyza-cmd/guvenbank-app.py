@@ -116,6 +116,8 @@ if "show_otp_option" not in st.session_state:
     st.session_state.show_otp_option = False
 if "otp_sent" not in st.session_state:
     st.session_state.otp_sent = False
+if "user_name" not in st.session_state:
+    st.session_state.user_name = None
 
 # --- Kullanıcı Giriş Alanı ---
 st.subheader("Giriş Yap")
@@ -153,6 +155,7 @@ if st.session_state.show_otp_option and not st.session_state.otp_sent:
             st.session_state.otp = otp
             st.session_state.otp_expiration = expiration
             st.session_state.otp_sent = True
+            st.session_state.user_name = name2  # Burada kullanıcı adını kaydediyoruz.
 
             cursor.execute("INSERT INTO otps (name, email, otp, expiration) VALUES (?, ?, ?, ?)",
                            (name2, email, otp, expiration))
@@ -186,6 +189,7 @@ if st.session_state.otp_sent:
                 st.success("Giriş Başarılı!")
                 st.session_state.authenticated = True
                 st.session_state.otp_sent = False
+                st.session_state.user_name = user_name  # Giriş yapan kullanıcı adını güncelle (daha doğru olur).
             else:
                 st.error("Şifrenizin süresi dolmuş!")
         else:
@@ -193,8 +197,9 @@ if st.session_state.otp_sent:
 
 # --- Başarılı Giriş Sonrası ---
 if st.session_state.authenticated:
-    st.markdown("""
-        <h2 style='text-align:center; color:green;'>✔ Giriş Yaptınız!</h2>
+    user_name = st.session_state.get("user_name", "Kullanıcı")
+    st.markdown(f"""
+        <h2 style='text-align:center; color:green;'>✔ Giriş Yaptınız, {user_name}!</h2>
         <p style='text-align:center;'>
             <a href='https://beyza-cmd.github.io/guvenbank-app.py/' target='_blank' style='
                 font-size:18px;
