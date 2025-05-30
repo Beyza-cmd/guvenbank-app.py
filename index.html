@@ -102,5 +102,32 @@
     <footer>
         <p>&copy; 2025 GüvenBank. Tüm hakları saklıdır.</p>
     </footer>
+    <script>
+    function updatePassword() {
+        const newPassword = document.getElementById('new-password').value;
+        const repeatPassword = document.getElementById('repeat-password').value;
+        const usage = document.getElementById('usage-frequency').value;
+
+        if (newPassword === "" || repeatPassword === "") {
+            alert("Lütfen tüm alanları doldurun.");
+            return;
+        }
+
+        if (newPassword !== repeatPassword) {
+            alert("Şifreler eşleşmiyor.");
+            return;
+        }
+
+        // Burada sunucuya gönderme işlemi yapılabilir (backend kodu gerekir)
+        // Şimdilik sadece kullanıcıya mesaj gösteriyoruz:
+        alert("Yeni şifreniz başarıyla kaydedildi.\nKullanım süresi: " + usage);
+        
+        // Formu temizlemek istersen:
+        document.getElementById('new-password').value = "";
+        document.getElementById('repeat-password').value = "";
+        document.getElementById('usage-frequency').selectedIndex = 0;
+    }
+</script>
+
 </body>
 </html>
