@@ -5,6 +5,7 @@ import smtplib
 from email.mime.text import MIMEText
 from datetime import datetime, timedelta
 import sqlite3
+import hashlib
 
 # --- Veritabanı Bağlantısı ---
 conn = sqlite3.connect("guvenbank.db", detect_types=sqlite3.PARSE_DECLTYPES|sqlite3.PARSE_COLNAMES)
@@ -26,6 +27,18 @@ CREATE TABLE IF NOT EXISTS giris_kayitlari (
 )
 """)
 conn.commit()
+# Şifre güncelleme tablosu
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS sifre_guncelleme (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT,
+    new_password TEXT,
+    usage_period TEXT,
+    updated_at TIMESTAMP
+)
+""")
+conn.commit()
+
 
 # --- Şifre oluşturma fonksiyonu ---
 def generate_password(length):
@@ -179,16 +192,25 @@ if st.session_state.otp_sent:
                 cursor.execute("DELETE FROM otps WHERE id = ?", (otp_id,))
                 conn.commit()
 
-                cursor.execute("INSERT INTO giris_kayitlari (name, login_time) VALUES (?, ?)", (user_name, datetime.now()))
-                conn.commit()
+                # Şifreyi SHA-256 ile hashle
+hashed_password = hashlib.sha256(new_password.encode()).hexdigest()
+
+# Hash'lenmiş şifreyi veritabanına kaydet
+cursor.execute("INSERT INTO sifre_guncelleme (name, new_password, usage_period, updated_at) VALUES (?, ?, ?, ?)",
+               (st.session_state.get('user_name', 'Kullanıcı'), hashed_password, usage_frequency, datetime.now()))
+conn.commit()
+
 
                 st.success("Giriş Başarılı!")
                 st.session_state.authenticated = True
                 st.session_state.otp_sent = False
+                st.session_state.user_name = user_name
+
             else:
                 st.error("Şifrenizin süresi dolmuş!")
-        else:
-            st.error("Geçersiz şifre!")
+            else:
+                st.error("Geçersiz şifre!")
+            
 
 # --- Başarılı Giriş Sonrası ---
 # --- Başarılı Giriş Sonrası ---
@@ -205,6 +227,28 @@ if st.session_state.authenticated:
             '>👉 GüvenBank Uygulamasına Git</a>
         </p>
     """, unsafe_allow_html=True)
+    # Profil ve Şifre Güncelleme Paneli
+    st.markdown("<hr>", unsafe_allow_html=True)
+    st.markdown(f"<div style='text-align:right;'>👤 <strong>{st.session_state.get('user_name', 'Kullanıcı')}</strong></div>", unsafe_allow_html=True)
+
+    with st.expander("🔐 Profil Ayarları - Şifre Güncelle"):
+        st.subheader("Şifrenizi Güncelleyin")
+
+        new_password = st.text_input("Yeni Şifre", type="password")
+        new_password_repeat = st.text_input("Yeni Şifre (Tekrar)", type="password")
+        usage_frequency = st.selectbox("Yeni şifre kullanım süresi", ["3 ay", "6 ay", "9 ay"])
+
+        if st.button("Şifreyi Güncelle"):
+            if new_password != new_password_repeat:
+                st.error("Şifreler uyuşmuyor!")
+            elif not new_password:
+                st.error("Şifre boş olamaz!")
+            else:
+                # Şifreyi veritabanına kayıt etme örneği (kendi veritabanı şema yapına göre değiştir)
+                cursor.execute("INSERT INTO giris_kayitlari (name, login_time) VALUES (?, ?)",
+                               (st.session_state.get('user_name', 'Kullanıcı'), datetime.now()))
+                conn.commit()
+                st.success("✅ Yeni şifreniz başarıyla oluşturuldu!")
 
 
 
