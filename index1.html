@@ -3,134 +3,348 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GüvenBank - Anasayfa</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Bank Interface</title>
     <style>
-        .user-profile {
-            position: absolute;
-            top: 10px;
-            right: 20px;
-            background-color: #f1f1f1;
-            padding: 10px 15px;
-            border-radius: 8px;
-            cursor: pointer;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        .user-profile:hover .profile-dropdown {
-            display: block;
-        }
-
-        .profile-dropdown {
-            display: none;
-            position: absolute;
-            top: 45px;
-            right: 0;
-            background-color: #fff;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-            padding: 15px;
-            width: 250px;
-            z-index: 999;
-        }
-
-        .profile-dropdown input,
-        .profile-dropdown select {
-            width: 100%;
-            margin-bottom: 10px;
-            padding: 8px;
-        }
-
-        .profile-dropdown button {
-            padding: 8px;
-            width: 100%;
-            background-color: #003366;
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a1a;
             color: white;
-            border: none;
-            border-radius: 5px;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            color: #ff4757;
+            font-weight: 300;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .balance-card {
+            background: linear-gradient(135deg, #ff4757, #ff3742);
+            border-radius: 20px;
+            padding: 3rem 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(255, 71, 87, 0.3);
+            animation: slideUp 0.8s ease-out 0.2s both;
+            transition: transform 0.3s ease;
+        }
+
+        .balance-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .balance-amount {
+            font-size: 3rem;
+            font-weight: 200;
+            margin-bottom: 0.5rem;
+        }
+
+        .balance-label {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: #2a2a2a;
+            border-radius: 15px;
+            padding: 2rem;
+            border-left: 4px solid #ff4757;
+            transition: all 0.3s ease;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .card:nth-child(1) { animation-delay: 0.4s; }
+        .card:nth-child(2) { animation-delay: 0.6s; }
+
+        .card:hover {
+            background: #333;
+            transform: translateX(5px);
+        }
+
+        .card h3 {
+            color: #ff4757;
+            font-size: 1rem;
+            font-weight: 400;
+            margin-bottom: 1rem;
+        }
+
+        .card-amount {
+            font-size: 1.8rem;
+            font-weight: 300;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-desc {
+            color: #888;
+            font-size: 0.8rem;
+        }
+
+        .actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .action-btn {
+            background: transparent;
+            border: 1px solid #ff4757;
+            color: #ff4757;
+            padding: 1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            animation: fadeIn 0.8s ease-out 0.8s both;
+        }
+
+        .action-btn:hover {
+            background: #ff4757;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .transactions {
+            background: #2a2a2a;
+            border-radius: 15px;
+            padding: 2rem;
+            animation: slideUp 0.8s ease-out 1s both;
+        }
+
+        .transactions h3 {
+            color: #ff4757;
+            font-size: 1.1rem;
+            font-weight: 400;
+            margin-bottom: 1.5rem;
+        }
+
+        .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid #333;
+            transition: all 0.3s ease;
+        }
+
+        .transaction:hover {
+            background: rgba(255, 71, 87, 0.05);
+            padding-left: 10px;
+        }
+
+        .transaction:last-child {
+            border-bottom: none;
+        }
+
+        .transaction-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .transaction-icon {
+            width: 40px;
+            height: 40px;
+            background: #333;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .transaction-details h4 {
+            font-size: 0.9rem;
+            font-weight: 400;
+            margin-bottom: 0.2rem;
+        }
+
+        .transaction-details span {
+            color: #666;
+            font-size: 0.8rem;
+        }
+
+        .transaction-amount {
+            font-weight: 300;
+        }
+
+        .positive {
+            color: #2ed573;
+        }
+
+        .negative {
+            color: #ff4757;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+            
+            .balance-card {
+                padding: 2rem 1rem;
+            }
+            
+            .balance-amount {
+                font-size: 2.5rem;
+            }
+            
+            .actions {
+                grid-template-columns: 1fr 1fr;
+            }
         }
     </style>
 </head>
 <body>
-    <header>
-        <div class="logo">GüvenBank</div>
-        <nav>
-            <ul>
-                <li><a href="index.html">Anasayfa</a></li>
-                <li><a href="hakkimizda.html">Hakkımızda</a></li>
-                <li><a href="hizmetler.html">Hizmetler</a></li>
-                <li><a href="kampanyalar.html">Kampanyalar</a></li>
-                <li><a href="iletisim.html">İletişim</a></li>
-            </ul>
-        </nav>
+    <div class="container">
+        <div class="header">
+            <h1>Hesap Özeti</h1>
+            <p>Son güncelleme: Bugün 14:30</p>
+        </div>
 
-        <!-- Kullanıcı Profili Menüsü -->
-        <div class="user-profile" id="user-profile">
-            Merhaba, <strong id="Beyza SOLMAZ">Kullanıcı</strong>
-            <div class="profile-dropdown">
-                <h4>Şifre Güncelle</h4>
-                <input type="password" id="new-password" placeholder="Yeni Şifre">
-                <input type="password" id="repeat-password" placeholder="Şifreyi Tekrar Girin">
-                <select id="usage-frequency">
-                    <option value="3 ay">3 Ay</option>
-                    <option value="6 ay">6 Ay</option>
-                    <option value="9 ay">9 Ay</option>
-                </select>
-                <button onclick="updatePassword()">Şifreyi Kaydet</button>
+        <div class="balance-card">
+            <div class="balance-amount">₺25,480</div>
+            <div class="balance-label">Ana Hesap Bakiyesi</div>
+        </div>
+
+        <div class="cards-grid">
+            <div class="card">
+                <h3>Kredi Kartı</h3>
+                <div class="card-amount">₺8,250</div>
+                <div class="card-desc">Kullanılabilir limit</div>
+            </div>
+
+            <div class="card">
+                <h3>Yatırım</h3>
+                <div class="card-amount">₺42,150</div>
+                <div class="card-desc">Portföy değeri</div>
             </div>
         </div>
-    </header>
 
-    <section class="hero">
-        <h1>GüvenBank'a Hoş Geldiniz</h1>
-        <p>Finansal geleceğinizi güvenle inşa edin. Modern çözümler, geleneksel güven ile.</p>
-        <a href="hizmetler.html" class="btn">Hizmetlerimizi Keşfedin</a>
-    </section>
+        <div class="actions">
+            <button class="action-btn" onclick="showNotification('Transfer işlemi')">Transfer</button>
+            <button class="action-btn" onclick="showNotification('Fatura ödeme')">Fatura Öde</button>
+            <button class="action-btn" onclick="showNotification('QR kod')">QR Kod</button>
+            <button class="action-btn" onclick="showNotification('ATM bulma')">ATM Bul</button>
+        </div>
 
-    <section class="features">
-        <div class="feature">
-            <h2>7/24 Müşteri Desteği</h2>
-            <p>Her an yanınızdayız. Sorularınızı yanıtlamak ve size yardımcı olmak için buradayız.</p>
-        </div>
-        <div class="feature">
-            <h2>Hızlı ve Güvenli İşlemler</h2>
-            <p>İşlemlerinizi saniyeler içinde, maksimum güvenlik ile gerçekleştirin.</p>
-        </div>
-        <div class="feature">
-            <h2>Dijital Bankacılık</h2>
-            <p>Mobil ve internet bankacılığı ile bankacılık işlemleriniz her an elinizin altında.</p>
-        </div>
-    </section>
+        <div class="transactions">
+            <h3>Son İşlemler</h3>
+            
+            <div class="transaction">
+                <div class="transaction-info">
+                    <div class="transaction-icon">🛒</div>
+                    <div class="transaction-details">
+                        <h4>Market</h4>
+                        <span>Bugün</span>
+                    </div>
+                </div>
+                <div class="transaction-amount negative">-₺127</div>
+            </div>
 
-    <footer>
-        <p>&copy; 2025 GüvenBank. Tüm hakları saklıdır.</p>
-    </footer>
+            <div class="transaction">
+                <div class="transaction-info">
+                    <div class="transaction-icon">💰</div>
+                    <div class="transaction-details">
+                        <h4>Maaş</h4>
+                        <span>Dün</span>
+                    </div>
+                </div>
+                <div class="transaction-amount positive">+₺8,500</div>
+            </div>
+
+            <div class="transaction">
+                <div class="transaction-info">
+                    <div class="transaction-icon">⚡</div>
+                    <div class="transaction-details">
+                        <h4>Elektrik</h4>
+                        <span>2 gün önce</span>
+                    </div>
+                </div>
+                <div class="transaction-amount negative">-₺285</div>
+            </div>
+
+            <div class="transaction">
+                <div class="transaction-info">
+                    <div class="transaction-icon">🛍️</div>
+                    <div class="transaction-details">
+                        <h4>Alışveriş</h4>
+                        <span>3 gün önce</span>
+                    </div>
+                </div>
+                <div class="transaction-amount negative">-₺450</div>
+            </div>
+        </div>
+    </div>
 
     <script>
-        // Kullanıcının ad soyad bilgisini localStorage'dan al
-        const userFullname = localStorage.getItem('fullname') || "Kullanıcı";
-        document.getElementById("user-fullname").innerText = userFullname;
-
-        function updatePassword() {
-            const newPassword = document.getElementById('new-password').value;
-            const repeatPassword = document.getElementById('repeat-password').value;
-            const usage = document.getElementById('usage-frequency').value;
-
-            if (!newPassword || !repeatPassword) {
-                alert("Lütfen tüm alanları doldurun.");
-                return;
-            }
-
-            if (newPassword !== repeatPassword) {
-                alert("Şifreler eşleşmiyor.");
-                return;
-            }
-
-            alert("Yeni şifreniz başarıyla kaydedildi.\nKullanım süresi: " + usage);
-
-            // Formu temizle
-            document.getElementById('new-password').value = "";
-            document.getElementById('repeat-password').value = "";
-            document.getElementById('usage-frequency').selectedIndex = 0;
+        function showNotification(action) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #ff4757;
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 10px;
+                z-index: 1000;
+                transform: translateX(300px);
+                transition: transform 0.3s ease;
+                font-size: 0.9rem;
+            `;
+            
+            notification.textContent = action + ' - Yakında aktif!';
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 10);
+            
+            setTimeout(() => {
+                notification.style.transform = 'translateX(300px)';
+                setTimeout(() => notification.remove(), 300);
+            }, 2000);
         }
     </script>
 </body>
