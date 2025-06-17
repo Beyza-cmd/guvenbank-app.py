@@ -16,12 +16,44 @@
             background: #1a1a1a;
             color: white;
             min-height: 100vh;
-            padding: 2rem;
+        }
+
+        header {
+            background: #2a2a2a;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #ff4757;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #ff4757;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        nav ul li a:hover {
+            color: #ff4757;
         }
 
         .container {
             max-width: 1000px;
             margin: 0 auto;
+            padding: 2rem;
         }
 
         .header {
@@ -217,7 +249,19 @@
         }
 
         @media (max-width: 768px) {
-            body {
+            header {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem;
+            }
+            
+            nav ul {
+                flex-wrap: wrap;
+                gap: 1rem;
+                justify-content: center;
+            }
+            
+            .container {
                 padding: 1rem;
             }
             
@@ -236,7 +280,7 @@
     </style>
 </head>
 <body>
-     <header>
+    <header>
         <div class="logo">GüvenBank</div>
         <nav>
             <ul>
@@ -248,7 +292,8 @@
                 <li><a href="iletisim.html">İletişim</a></li>
             </ul>
         </nav>
-    
+    </header>
+
     <div class="container">
         <div class="header">
             <h1>Hesap Özeti</h1>
