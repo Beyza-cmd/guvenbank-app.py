@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GüvenBank - Anasayfa</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+        }
+
+        header {
+            background-color: #003366;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .user-profile {
+            background-color: #f1f1f1;
+            color: black;
+            padding: 10px 15px;
+            border-radius: 8px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .user-profile:hover .profile-dropdown {
+            display: block;
+        }
+
+        .profile-dropdown {
+            display: none;
+            position: absolute;
+            top: 45px;
+            right: 0;
+            background-color: #fff;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            padding: 15px;
+            width: 250px;
+            z-index: 999;
+        }
+
+        .profile-dropdown input,
+        .profile-dropdown select {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 8px;
+        }
+
+        .profile-dropdown button {
+            padding: 8px;
+            width: 100%;
+            background-color: #003366;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+
+        .hero {
+            background-color: #e6f0ff;
+            padding: 60px 20px;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        .hero p {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            background-color: #003366;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .features {
+            display: flex;
+            justify-content: space-around;
+            padding: 40px 20px;
+            background-color: #f9f9f9;
+        }
+
+        .feature {
+            max-width: 300px;
+            text-align: center;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #003366;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">GüvenBank</div>
+        <nav>
+            <ul>
+                <li><a href="index.html">Anasayfa</a></li>
+                <li><a href="hakkimizda.html">Hakkımızda</a></li>
+                <li><a href="hizmetler.html">Hizmetler</a></li>
+                <li><a href="kampanyalar.html">Kampanyalar</a></li>
+                <li><a href="iletisim.html">İletişim</a></li>
+            </ul>
+        </nav>
+
+        <!-- Kullanıcı Profili Menüsü -->
+        <div class="user-profile" id="user-profile">
+            Merhaba, <strong id="user-fullname">Kullanıcı</strong>
+            <div class="profile-dropdown">
+                <h4>Şifre Güncelle</h4>
+                <input type="password" id="new-password" placeholder="Yeni Şifre">
+                <input type="password" id="repeat-password" placeholder="Şifreyi Tekrar Girin">
+                <select id="usage-frequency">
+                    <option value="3 ay">3 Ay</option>
+                    <option value="6 ay">6 Ay</option>
+                    <option value="9 ay">9 Ay</option>
+                </select>
+                <button onclick="updatePassword()">Şifreyi Kaydet</button>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero">
+        <h1>GüvenBank'a Hoş Geldiniz</h1>
+        <p>Finansal geleceğinizi güvenle inşa edin. Modern çözümler, geleneksel güven ile.</p>
+        <a href="hizmetler.html" class="btn">Hizmetlerimizi Keşfedin</a>
+    </section>
+
+    <section class="features">
+        <div class="feature">
+            <h2>7/24 Müşteri Desteği</h2>
+            <p>Her an yanınızdayız. Sorularınızı yanıtlamak ve size yardımcı olmak için buradayız.</p>
+        </div>
+        <div class="feature">
+            <h2>Hızlı ve Güvenli İşlemler</h2>
+            <p>İşlemlerinizi saniyeler içinde, maksimum güvenlik ile gerçekleştirin.</p>
+        </div>
+        <div class="feature">
+            <h2>Dijital Bankacılık</h2>
+            <p>Mobil ve internet bankacılığı ile bankacılık işlemleriniz her an elinizin altında.</p>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2025 GüvenBank. Tüm hakları saklıdır.</p>
+    </footer>
+
+    <script>
+        // Ad Soyadı yerleştir
+        const userFullname = localStorage.getItem('fullname') || "Kullanıcı";
+        document.getElementById("user-fullname").innerText = userFullname;
+
+        function updatePassword() {
+            const newPassword = document.getElementById('new-password').value;
+            const repeatPassword = document.getElementById('repeat-password').value;
+            const usage = document.getElementById('usage-frequency').value;
+
+            if (!newPassword || !repeatPassword) {
+                alert("Lütfen tüm alanları doldurun.");
+                return;
+            }
+
+            if (newPassword !== repeatPassword) {
+                alert("Şifreler eşleşmiyor.");
+                return;
+            }
+
+            alert("Yeni şifreniz başarıyla kaydedildi.\nKullanım süresi: " + usage);
+
+            // Temizle
+            document.getElementById('new-password').value = "";
+            document.getElementById('repeat-password').value = "";
+            document.getElementById('usage-frequency').selectedIndex = 0;
+        }
+    </script>
+</body>
+</html>
